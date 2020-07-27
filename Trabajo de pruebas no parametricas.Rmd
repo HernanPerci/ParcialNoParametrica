@@ -1,0 +1,127 @@
+---
+title: Pruebas no parametricas aplicadas a las trabas administrativas de los trabajadores
+  del Estado
+author: "Grupo 4"
+date: "26/7/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Objetivo
+
+Aplicar algunas `pruebas no parametricas` a algunas variables de interes con respecto a las trabas administrativas que tienen los trabajadores del estado. 
+
+El código empleado se puede verificar en el siguiente **link** :  <https://github.com/HernanPerci/ParcialNoParametrica>.
+
+## Descripción de la base de datos
+
+Se recogen informaciones sobre las trabas administrativas que tienen los trabajadores en su ambiente laboral, asi como si sabe a que sistema administrativo se relaciona su experiencia tratada y acciones que nos pueda recomendar para solucionarlo.
+
+Los problemas o trabas se tratan de relacionar con los tipos de entidad pública de la cual proviene el trabajador.
+
+Cada entidad de las cuales podemos identificar del cual proviene el trabajador, tiene asociado un nivel de gobierno respectivo.
+
+Se recopilo tambien el organo de pertenencia del trabajador, su sexo y sus años trabajando en el estado con el fin de encontrar relaciones sobre los problemas administrativos con estas variables.
+
+## Población
+
+La población son todos los trabajadores del estado a traves del tiempo que dure la encuesta en línea. 
+
+## Muestra
+
+Es una muestra no probabilistica donde los que llegan a responder son los interesados que les llego el correo con el link de la encuesta.
+
+## Unidad de análisis
+
+Cada trabajador del estado que responda la encuesta.
+
+## Variables y escalas de medición
+
+```{r }
+library(tidyverse)
+library(readxl)
+library(lubridate)
+
+```
+
+
+```{r}
+bbdd <- read_excel("bbdd_no_parametrica.xlsx", 
+    range = "A3:Z2261", col_types = c("date", 
+        "text", "text", "text", "text", "text", 
+        "text", "text", "text", "text", "text", 
+        "text", "text", "text", "text", "text", 
+        "text", "text", "text", "text", "text", 
+        "text", "text", "text", "text", "text"))
+
+#-------------------
+
+bbdd$Identificado <- factor(bbdd$Identificado , levels = c("Identificado", "No Identificado", "Viciado", "No Aplica", "Sin Respuesta"))
+
+#-------------------
+
+bbdd$Priorizado <- factor(bbdd$Priorizado , levels = c("Si", "No", "Viciado", "No Aplica", "Sin Respuesta"))
+
+#--------------------
+
+bbdd$`Nivel de gobierno` <- factor(bbdd$`Nivel de gobierno` , levels = c("Nacional", "Regional", "Local", "Viciado", "No Identificado", "No Aplica", "Sin Respuesta"))
+
+#-------------------
+
+bbdd$`Organo de pertenencia` <- factor(bbdd$`Organo de pertenencia`, levels = c("Órgano de Apoyo (recursos humanos, administración, tecnologías de la información, otros)", "Órgano de Asesoría (jurídica, planeamiento, presupuesto, otros)", "Órgano de Línea", "Otros", "Sin Respuesta"), labels = c("apoyo", "asesoria", "linea", "Otros","Sin Respuesta"))
+
+#-------------------
+
+bbdd$`Años trabajando en el Estado` <- factor(bbdd$`Años trabajando en el Estado`, levels = c("Menos de dos años", "De dos a cinco años", "De seis a diez años", "Más de diez años", "Sin Respuesta"), labels = c("[0 - 2>", "[2 - 5]", "[6 - 10]", "[11 a más>", "Sin Respuesta"))
+
+glimpse(bbdd)
+```
+
+## Resultados descriptivos
+
+```{r }
+ggplot(bbdd, aes(x = Identificado)) +
+  geom_bar(aes(fill = Identificado)) +
+  scale_fill_brewer(palette = "Blues") +
+  labs(y = "frecuencia", title = "Frecuencia de encuestas identificadas") +
+  geom_text(stat = 'count', aes(label = ..count..), position = position_dodge(0.9), color = "black")
+
+ggplot(bbdd, aes(x = Priorizado)) +
+  geom_bar(aes(fill = Priorizado)) +
+  scale_fill_brewer(palette = "Blues") +
+  labs(y = "frecuencia", title = "Frecuencia de encuestas priorizadas") +
+  geom_text(stat = 'count', aes(label = ..count..), position = position_dodge(0.9), color = "black")
+
+ggplot(bbdd, aes(x = `Nivel de gobierno`)) +
+  geom_bar(aes(fill = `Nivel de gobierno`)) +
+  scale_fill_brewer(palette = "Blues") +
+  labs(y = "frecuencia", title = "Frecuencia de encuestas por nivel de gobierno") +
+  geom_text(stat = 'count', aes(label = ..count..), position = position_dodge(0.9), color = "black")
+
+ggplot(bbdd, aes(x = `Organo de pertenencia`)) +
+  geom_bar(aes(fill = `Organo de pertenencia`)) +
+  scale_fill_brewer(palette = "Blues") +
+  labs(y = "frecuencia", title = "Frecuencia de encuestas por organo de pertenencia") +
+  geom_text(stat = 'count', aes(label = ..count..), position = position_dodge(0.9), color = "black")
+
+ggplot(bbdd, aes(x = Sexo)) +
+  geom_bar(aes(fill = Sexo)) +
+  scale_fill_brewer(palette = "Blues") +
+  labs(y = "frecuencia", title = "Frecuencia de encuestas por sexo") +
+  geom_text(stat = 'count', aes(label = ..count..), position = position_dodge(0.9), color = "black")
+
+ggplot(bbdd, aes(x = `Años trabajando en el Estado`)) +
+  geom_bar(aes(fill = `Años trabajando en el Estado`)) +
+  scale_fill_brewer(palette = "Blues") +
+  labs(y = "frecuencia", title = "Frecuencia de encuestas por años trabajando en el estado") +
+  geom_text(stat = 'count', aes(label = ..count..), position = position_dodge(0.9), color = "black")
+
+ggplot(bbdd, aes(x = completa)) +
+  geom_bar(aes(fill = completa)) +
+  scale_fill_brewer(palette = "Blues") +
+  labs(y = "frecuencia", title = "Frecuencia de encuestas completas") +
+  geom_text(stat = 'count', aes(label = ..count..), position = position_dodge(0.9), color = "black")
+```
